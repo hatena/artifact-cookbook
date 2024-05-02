@@ -39,13 +39,14 @@ def load_current_resource
     @nexus_connection = Chef::Artifact::Nexus.new(node, nexus_configuration)
   elsif Chef::Artifact.from_s3?(@new_resource.location)
     chef_gem "aws-sdk" do
-      version "1.29.0"
+      version "2.1.32"
+      action :install
     end
   end
   @file_location = new_resource.location
   @file_path = new_resource.path
 
-  @current_resource = Chef::Resource::ArtifactFile.new(@new_resource.name)
+  @current_resource = Chef::Resource.resource_for_node(:artifact_file, node).new(@new_resource.name)
   @current_resource
 end
 
@@ -135,6 +136,10 @@ def remote_file_resource
     backup false
     action :nothing
   end
+end
+
+def manage_symlink_access?
+    false
 end
 
 private
